@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Tag, message, Button, Popconfirm } from 'antd';
 import { DeleteFilled, LockFilled, UnlockFilled } from '@ant-design/icons';
 import axios from 'axios';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 function Admin() {
     const [users, setUsers] = useState([]);
@@ -48,6 +49,13 @@ function Admin() {
             message.error('Failed to update user status');
         }
     };
+
+    const pieData = [
+        { name: 'Premium user', value: vipCount },
+        { name: 'Regular user', value: nonVipCount }
+    ];
+
+    const COLORS = ['#FFD700', '#1E90FF']; 
 
     const columns = [
         {
@@ -109,9 +117,28 @@ function Admin() {
 
     return (
         <div>
-            <h1>User Management</h1>
-            <p>Number of VIP Users: {vipCount}</p>
-            <p>Number of Non-VIP Users: {nonVipCount}</p>
+            {/* <h1>User Management</h1> */}
+            <div style={{ width: '100%', height: 400 }}>
+                <ResponsiveContainer>
+                    <PieChart>
+                        <Pie
+                            data={pieData}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={150}
+                            label
+                            dataKey="value"
+                        >
+                            {pieData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                    </PieChart>
+                </ResponsiveContainer>
+            </div>
+
             <Table
                 bordered
                 dataSource={users}
