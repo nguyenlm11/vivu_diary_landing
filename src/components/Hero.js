@@ -29,7 +29,10 @@ function Hero() {
     };
 
     return (
-        <section style={{ ...styles.hero, backgroundImage: `url(${images[currentImageIndex]})` }}>
+        <section style={{
+            ...styles.hero, backgroundImage: `url(${images[currentImageIndex]})`, backgroundSize: 'cover',
+            backgroundPosition: 'center'
+        }}>
             <div style={styles.heroContent}>
                 <Button style={styles.heroButton} onClick={showModal}>Bắt đầu</Button>
             </div>
