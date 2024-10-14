@@ -98,7 +98,18 @@ const destinations = [
             "Tham gia các hoạt động văn hóa như chợ phiên ở các bản làng."
         ]
     },
-    // Thêm nhiều địa điểm khác nếu cần
+    {
+        name: "Tây Ninh",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/CaoDaiMain.jpg/1280px-CaoDaiMain.jpg",
+        description: "Tây Ninh nổi tiếng với núi Bà Đen và là trung tâm của đạo Cao Đài.",
+        tips: [
+            "Núi Bà Đen là điểm đến hấp dẫn cho những ai thích leo núi và ngắm cảnh.",
+            "Đừng bỏ qua cơ hội tham quan Tòa Thánh Cao Đài, công trình kiến trúc độc đáo và trung tâm tôn giáo lớn của Tây Ninh.",
+            "Thời điểm lý tưởng để tham quan Tây Ninh là từ tháng 12 đến tháng 4 khi thời tiết khô ráo và mát mẻ.",
+            "Thưởng thức các món đặc sản như bánh canh Trảng Bàng và bánh tráng phơi sương.",
+            "Nên đi cáp treo hoặc máng trượt lên đỉnh núi Bà Đen để tiết kiệm thời gian và có trải nghiệm thú vị."
+        ]
+    },
 ];
 
 function TravelDestinations() {
@@ -115,11 +126,13 @@ function TravelDestinations() {
         setSelectedDestination(null);
     };
 
+    const sortedDestinations = destinations.sort((a, b) => a.name.localeCompare(b.name));
+
     return (
         <div style={styles.container}>
-            <h1 style={styles.title}>Địa điểm du lịch tại Việt Nam</h1>
+            <h1 style={styles.title}>Mẹo du lịch tại một số địa điểm</h1>
             <div style={styles.cardContainer}>
-                {destinations.map((destination, index) => (
+                {sortedDestinations.map((destination, index) => (
                     <div key={index} style={styles.card} onClick={() => showModal(destination)}>
                         <img src={destination.image} alt={destination.name} style={styles.cardImage} />
                         <h3 style={styles.cardTitle}>{destination.name}</h3>
@@ -129,7 +142,7 @@ function TravelDestinations() {
             </div>
             <Modal
                 title={selectedDestination?.name}
-                visible={visible}
+                open={visible}
                 onCancel={handleCancel}
                 footer={[
                     <Button key="back" onClick={handleCancel}>

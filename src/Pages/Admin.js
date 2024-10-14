@@ -55,7 +55,7 @@ function Admin() {
         { name: 'Regular user', value: nonVipCount }
     ];
 
-    const COLORS = ['#FFD700', '#1E90FF']; 
+    const COLORS = ['#FFD700', '#1E90FF'];
 
     const columns = [
         {
@@ -74,10 +74,10 @@ function Admin() {
             key: 'phone',
         },
         {
-            title: 'VIP',
+            title: 'Premium',
             dataIndex: 'vip',
             key: 'vip',
-            render: vip => vip ? <Tag color="gold">VIP</Tag> : <Tag color="geekblue">Regular</Tag>,
+            render: vip => vip ? <Tag color="gold">Premium</Tag> : <Tag color="geekblue">Regular</Tag>,
         },
         {
             title: 'Status',
