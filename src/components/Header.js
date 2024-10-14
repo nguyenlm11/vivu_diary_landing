@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Button, Modal } from 'antd';
+import { Button, Dropdown, message, Modal } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
+import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
 
 function Header({ admin, setAdmin }) {
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -8,6 +9,7 @@ function Header({ admin, setAdmin }) {
 
     const handleLogout = () => {
         localStorage.removeItem('admin');
+        message.success('Đăng xuất thành công!');
         setAdmin(null);
         navigate('/');
     };
@@ -25,6 +27,25 @@ function Header({ admin, setAdmin }) {
         setIsModalVisible(false);
     };
 
+    const items = [
+        {
+            key: 'profile',
+            label: (
+                <Link to="#profile" style={{ color: '#2E5C8A', fontWeight: 'bold' }}>
+                    <UserOutlined /> Profile
+                </Link>
+            ),
+        },
+        {
+            key: 'logout',
+            label: (
+                <div onClick={showLogoutModal} style={{ color: '#2E5C8A', fontWeight: 'bold' }}>
+                    <LogoutOutlined /> Logout
+                </div>
+            ),
+        },
+    ]
+
     return (
         <header style={styles.header}>
             <div style={styles.logoContainer}>
@@ -41,9 +62,11 @@ function Header({ admin, setAdmin }) {
                 <Link to="/travel-destinations" style={styles.navLink}>Mẹo du lịch</Link>
 
                 {admin ? (
-                    <>
-                        <Button onClick={showLogoutModal} style={styles.navButton}>Đăng xuất</Button>
-                    </>
+                    <Dropdown menu={{ items }} placement="bottomRight">
+                        <Button style={styles.navButton}>
+                            {admin.name}
+                        </Button>
+                    </Dropdown>
                 ) : (
                     <Link to="/login">
                         <Button style={styles.navButton}>Đăng nhập</Button>
@@ -104,11 +127,6 @@ const styles = {
         fontWeight: 'bold',
         fontSize: '16px',
         transition: 'color 0.3s',
-    },
-    adminName: {
-        marginRight: '15px',
-        color: '#2E5C8A',
-        fontWeight: 'bold',
     },
     navButton: {
         marginLeft: '15px',
