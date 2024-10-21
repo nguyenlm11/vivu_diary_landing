@@ -1,48 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-const apiURL = "https://653d1d13f52310ee6a99e3b7.mockapi.io/user";
+const apiURL = "https://vivudiary.azurewebsites.net/api/Auth/login";
 
 function LoginPage({ setAdmin }) {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const fetchUsers = async () => {
-        try {
-            const response = await fetch(apiURL);
-            if (response.ok) {
-                const data = await response.json();
-                return data;
-            } else {
-                throw new Error("Failed to fetch users.");
+    useEffect(() => {
+        const adminData = localStorage.getItem('admin');
+        if (adminData) {
+            const parsedData = JSON.parse(adminData);
+            if (parsedData && parsedData.userRoleId.includes("Admin")) {
+                setAdmin(parsedData);
+                navigate('/');
             }
-        } catch (error) {
-            console.error(error);
-            message.error("Có lỗi xảy ra khi kết nối đến server.");
-            return [];
         }
-    };
+    }, [navigate, setAdmin]);
 
     const onFinish = async (values) => {
         setLoading(true);
 
-        const usersData = await fetchUsers();
-        const user = usersData.find(
-            (u) => u.email === values.email && u.password === values.password
-        );
+        try {
+            const response = await axios.post(apiURL, {
+                userName: values.userName,
+                password: values.password,
+            });
 
-        if (user) {
-            if (user.isAdmin) {
-                message.success('Đăng nhập thành công!');
-                localStorage.setItem('admin', JSON.stringify(user));
-                setAdmin(user);
-                navigate('/');
+            if (response.status === 200) {
+                const { data } = response.data;
+
+                if (data.userRoleId.includes("Admin")) {
+                    message.success('Đăng nhập thành công!');
+                    localStorage.setItem('admin', JSON.stringify(data));
+                    localStorage.setItem('accessToken', data.token); // Store access token
+                    setAdmin(data);
+                    navigate('/');
+                } else {
+                    message.error('Chỉ có Admin mới được đăng nhập!');
+                }
             } else {
-                message.error('Chỉ có Admin mới được đăng nhập!');
+                message.error('Email hoặc mật khẩu không chính xác!');
             }
-        } else {
-            message.error('Email hoặc mật khẩu không chính xác!');
+        } catch (error) {
+            console.error(error);
+            if (error.response && error.response.status === 401) {
+                message.error('Email hoặc mật khẩu không chính xác!');
+            } else {
+                message.error('Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại!');
+            }
         }
 
         setLoading(false);
@@ -65,11 +73,11 @@ function LoginPage({ setAdmin }) {
                     style={styles.form}
                 >
                     <Form.Item
-                        label="Email"
-                        name="email"
-                        rules={[{ required: true, message: 'Vui lòng nhập email!' }]}
+                        label="Tên người dùng"
+                        name="userName"
+                        rules={[{ required: true, message: 'Vui lòng nhập tên người dùng!' }]}
                     >
-                        <Input style={styles.input} placeholder="Nhập email của bạn" />
+                        <Input style={styles.input} placeholder="Nhập tên người dùng của bạn" />
                     </Form.Item>
 
                     <Form.Item

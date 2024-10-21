@@ -56,7 +56,10 @@ function Header({ admin, setAdmin }) {
             </div>
             <nav style={styles.navbar}>
                 {admin && (
-                    <Link to="/admin" style={styles.navLink}>Quản lý</Link>
+                    <>
+                        <Link to="/admin" style={styles.navLink}>Người dùng</Link>
+                        <Link to="/payment" style={styles.navLink}>Giao dịch</Link>
+                    </>
                 )}
                 <Link to="/about" style={styles.navLink}>Giới thiệu</Link>
                 <Link to="/travel-destinations" style={styles.navLink}>Mẹo du lịch</Link>
@@ -64,7 +67,7 @@ function Header({ admin, setAdmin }) {
                 {admin ? (
                     <Dropdown menu={{ items }} placement="bottomRight">
                         <Button style={styles.navButton}>
-                            {admin.name}
+                            {admin.userName}
                         </Button>
                     </Dropdown>
                 ) : (
