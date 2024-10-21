@@ -7,16 +7,36 @@ import About from './Pages/About';
 import Admin from './Pages/Admin';
 import LoginPage from './Pages/Login';
 import TravelDestinations from './Pages/TravelDestinations';
+import ProtectedRoute from './routes/ProtectedRoute';
+import Payment from './Pages/Payment';
 
 function App() {
-  const [admin, setAdmin] = useState(null);
+  const [admin, setAdmin] = useState(
+    JSON.parse(localStorage.getItem('admin')) || null
+  );
+
   return (
     <Router>
       <Header admin={admin} setAdmin={setAdmin} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<LoginPage setAdmin={setAdmin} />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute admin={admin}>
+              <Admin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payment"
+          element={
+            <ProtectedRoute admin={admin}>
+              <Payment />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/about" element={<About />} />
         <Route path="/travel-destinations" element={<TravelDestinations />} />
         {/* <Route path="#contract" element={<Contract />} /> */}
