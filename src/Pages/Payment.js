@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Tag, message, Button, Pagination, Modal } from 'antd';
+import { Table, Tag, message, Button, Pagination, Modal, Select } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+const { Option } = Select;
 
 function Payment() {
     const [payments, setPayments] = useState([]);
@@ -14,6 +16,7 @@ function Payment() {
     const [revenueData, setRevenueData] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [selectedPaymentId, setSelectedPaymentId] = useState(null);
+    const [viewMode, setViewMode] = useState('day'); // Thêm trạng thái để chọn chế độ xem
 
     const fetchPayments = async () => {
         setLoading(true);
@@ -28,7 +31,7 @@ function Payment() {
             setPayments(paymentsData);
             setTotal(response.data.data.totalItems);
             paymentsData.forEach(payment => fetchUserName(payment.customerId));
-            calculateRevenueData(paymentsData);
+            calculateRevenueData(paymentsData); // Tính toán dữ liệu doanh thu mặc định là theo ngày
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 message.error('Unauthorized: Access token may be invalid or expired.');
@@ -60,24 +63,26 @@ function Payment() {
 
     const calculateRevenueData = (paymentsData) => {
         const revenueMap = {};
+
         paymentsData.forEach(payment => {
             if (payment.paymentStatus === 2) {
                 const date = new Date(payment.paymentId);
-                const formattedDate = new Date(
-                    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
-                ).toISOString().split('T')[0];
+                const key = viewMode === 'day'
+                    ? date.toISOString().split('T')[0] // Ngày
+                    : `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}`; // Tháng
 
-                if (revenueMap[formattedDate]) {
-                    revenueMap[formattedDate] += payment.total;
+                if (revenueMap[key]) {
+                    revenueMap[key] += payment.total;
                 } else {
-                    revenueMap[formattedDate] = payment.total;
+                    revenueMap[key] = payment.total;
                 }
             }
         });
+
         const revenueArray = Object.keys(revenueMap)
-            .map(date => ({
-                date,
-                total: revenueMap[date],
+            .map(key => ({
+                date: key,
+                total: revenueMap[key],
             }))
             .sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -114,9 +119,14 @@ function Payment() {
         setIsModalVisible(false);
     };
 
+    const handleChangeViewMode = (value) => {
+        setViewMode(value);
+        calculateRevenueData(payments); // Cập nhật dữ liệu theo chế độ xem đã chọn
+    };
+
     useEffect(() => {
         fetchPayments();
-    }, [pageNumber, pageSize]);
+    }, [pageNumber, pageSize, viewMode]);
 
     const mapPaymentStatus = (status) => {
         switch (status) {
@@ -194,6 +204,12 @@ function Payment() {
 
     return (
         <div style={{ padding: '20px' }}>
+            <h3 style={{ marginBottom: '20px' }}>Xem thống kê theo: </h3>
+            <Select value={viewMode} onChange={handleChangeViewMode} style={{ marginBottom: '20px' }}>
+                <Option value="day">Ngày</Option>
+                <Option value="month">Tháng</Option>
+            </Select>
+
             <ResponsiveContainer width="100%" height={400}>
                 <LineChart data={revenueData}>
                     <CartesianGrid strokeDasharray="2 2" />
