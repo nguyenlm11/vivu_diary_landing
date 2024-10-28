@@ -57,8 +57,8 @@ function Header({ admin, setAdmin }) {
             <nav style={styles.navbar}>
                 {admin && (
                     <>
-                        <Link to="/admin" style={styles.navLink}>Người dùng</Link>
-                        <Link to="/payment" style={styles.navLink}>Giao dịch</Link>
+                        <Link to="/admin" style={styles.navLink}>Quản lý</Link>
+                        {/* <Link to="/payment" style={styles.navLink}>Giao dịch</Link> */}
                     </>
                 )}
                 <Link to="/about" style={styles.navLink}>Giới thiệu</Link>

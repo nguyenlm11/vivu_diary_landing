@@ -9,6 +9,7 @@ import LoginPage from './Pages/Login';
 import TravelDestinations from './Pages/TravelDestinations';
 import ProtectedRoute from './routes/ProtectedRoute';
 import Payment from './Pages/Payment';
+import AdminAndPayment from './Pages/Admin';
 
 function App() {
   const [admin, setAdmin] = useState(
@@ -25,18 +26,18 @@ function App() {
           path="/admin"
           element={
             <ProtectedRoute admin={admin}>
-              <Admin />
+              <AdminAndPayment />
             </ProtectedRoute>
           }
         />
-        <Route
+        {/* <Route
           path="/payment"
           element={
             <ProtectedRoute admin={admin}>
               <Payment />
             </ProtectedRoute>
           }
-        />
+        /> */}
         <Route path="/about" element={<About />} />
         <Route path="/travel-destinations" element={<TravelDestinations />} />
         {/* <Route path="#contract" element={<Contract />} /> */}

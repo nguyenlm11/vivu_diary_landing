@@ -1,35 +1,102 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Tag, message, Button, Popconfirm, Pagination } from 'antd';
-import { LockFilled, UnlockFilled } from '@ant-design/icons';
+import { Table, Tag, message, Button, Popconfirm, Pagination, Modal, Select } from 'antd';
+import { DeleteOutlined, LockFilled, UnlockFilled } from '@ant-design/icons';
 import axios from 'axios';
-import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
-function Admin() {
+const { Option } = Select;
+
+function AdminAndPayment() {
+    const [payments, setPayments] = useState([]);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [pageNumber, setPageNumber] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [total, setTotal] = useState(0);
+    const [userNames, setUserNames] = useState({});
+    const [revenueData, setRevenueData] = useState([]);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [selectedPaymentId, setSelectedPaymentId] = useState(null);
     const [premiumCount, setPremiumCount] = useState(0);
     const [regularCount, setRegularCount] = useState(0);
+    const [viewMode, setViewMode] = useState('payments');
+    const [dateViewMode, setDateViewMode] = useState('day');
+
+    useEffect(() => {
+        fetchPayments();
+        fetchUsers();
+        fetchUserStatistics();
+    }, []);
+
+    useEffect(() => {
+        if (viewMode === 'payments') {
+            fetchPayments();
+        } else {
+            fetchUsers();
+        }
+        calculateRevenueData(payments);
+    }, [viewMode, pageNumber, pageSize, dateViewMode]);
+
+
+    const fetchPayments = async () => {
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await axios.get(`https://vivudiary.azurewebsites.net/api/Payment/payments?pageNumber=${pageNumber}&pageSize=${pageSize}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const paymentsData = response.data.data.data;
+            setPayments(paymentsData);
+            setTotal(response.data.data.totalItems);
+            paymentsData.forEach(payment => fetchUserName(payment.customerId));
+            calculateRevenueData(paymentsData);
+        } catch (error) {
+            message.error('Failed to fetch payments');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchUserName = async (customerId) => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await axios.get(`https://vivudiary.azurewebsites.net/api/User/searchBy${customerId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setUserNames(prevState => ({
+                ...prevState,
+                [customerId]: response.data.data.fullName,
+            }));
+        } catch (error) {
+            message.error(`Failed to fetch user name for customer ID: ${customerId}`);
+        }
+    };
+
+    const calculateRevenueData = (paymentsData) => {
+        const revenueMap = {};
+        paymentsData.forEach(payment => {
+            if (payment.paymentStatus === 2) {
+                const date = new Date(payment.paymentId);
+                const key = dateViewMode === 'day'
+                    ? date.toISOString().split('T')[0]
+                    : `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}`;
+                revenueMap[key] = (revenueMap[key] || 0) + payment.total;
+            }
+        });
+        setRevenueData(Object.keys(revenueMap).map(key => ({ date: key, total: revenueMap[key] })));
+    };
 
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('accessToken'); // Retrieve the token from local storage or wherever it's stored
+            const token = localStorage.getItem('accessToken');
             const response = await axios.get(`https://vivudiary.azurewebsites.net/api/User/getAllUsers?pageNumber=${pageNumber}&pageSize=${pageSize}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                headers: { Authorization: `Bearer ${token}` }
             });
             setUsers(response.data.data.results);
             setTotal(response.data.data.totalCount);
         } catch (error) {
-            if (error.response && error.response.status === 401) {
-                message.error('Unauthorized: Access token may be invalid or expired.');
-            } else {
-                message.error('Failed to fetch users');
-            }
+            message.error('Failed to fetch users');
         } finally {
             setLoading(false);
         }
@@ -39,29 +106,29 @@ function Admin() {
         try {
             const token = localStorage.getItem('accessToken');
             const response = await axios.get(`https://vivudiary.azurewebsites.net/api/User/getAllUsers?pageNumber=1&pageSize=10000`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                headers: { Authorization: `Bearer ${token}` }
             });
-
-            if (response.status === 200) {
-                const allUsers = response.data.data.results;
-                const premiumUsersCount = allUsers.filter(user => user.isPremium).length;
-                const regularUsersCount = allUsers.length - premiumUsersCount;
-                setPremiumCount(premiumUsersCount);
-                setRegularCount(regularUsersCount);
-            } else {
-                message.error('Failed to fetch user statistics');
-            }
+            const allUsers = response.data.data.results;
+            setPremiumCount(allUsers.filter(user => user.isPremium).length);
+            setRegularCount(allUsers.length - premiumCount);
         } catch (error) {
             message.error('Error fetching user statistics');
         }
     };
 
-    useEffect(() => {
-        fetchUsers();
-        fetchUserStatistics();
-    }, [pageNumber, pageSize]);
+    const handleConfirmPayment = async () => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            await axios.put(`https://vivudiary.azurewebsites.net/api/Payment/confirm?id=${selectedPaymentId}`, {}, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            message.success('Payment confirmed successfully');
+            fetchPayments();
+            setIsModalVisible(false);
+        } catch (error) {
+            message.error('Failed to confirm payment');
+        }
+    };
 
     const handleToggleBan = async (id, isActive) => {
         try {
@@ -69,131 +136,127 @@ function Admin() {
             const apiUrl = isActive
                 ? `https://vivudiary.azurewebsites.net/api/User/ban/${id}`
                 : `https://vivudiary.azurewebsites.net/api/User/unban/${id}`;
-
-            const response = await axios.put(apiUrl, {}, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+            await axios.put(apiUrl, {}, {
+                headers: { Authorization: `Bearer ${token}` }
             });
-
-            if (response.status === 200) {
-                message.success(isActive ? 'User banned successfully' : 'User unbanned successfully');
-                fetchUsers();
-                fetchUserStatistics();
-            } else {
-                message.error(isActive ? 'Failed to ban user' : 'Failed to unban user');
-            }
+            message.success(isActive ? 'User banned successfully' : 'User unbanned successfully');
+            fetchUsers();
+            fetchUserStatistics();
         } catch (error) {
-            message.error(`Failed to ${isActive ? 'ban' : 'unban'} user: ${error.response ? error.response.data.message : error.message}`);
+            message.error('Failed to toggle ban status');
         }
     };
 
-    const columns = [
+    const columns = viewMode === 'payments' ? [
+        { title: 'Payment ID', dataIndex: 'paymentId', key: 'paymentId' },
+        { title: 'Customer Name', dataIndex: 'customerId', render: (id) => userNames[id] },
+        { title: 'Total', dataIndex: 'total', render: (total) => `${total.toLocaleString()} VNĐ` },
+        { title: 'Payment Status', dataIndex: 'paymentStatus', render: (status) => <Tag color={status === 1 ? 'gold' : 'green'}>{status === 1 ? 'Pending' : 'Paid'}</Tag> },
         {
-            title: 'Name',
-            dataIndex: 'fullName',
-            key: 'fullName',
-        },
+            title: 'Action', key: 'action', render: (_, record) => record.paymentStatus === 1 && (
+                <Button type="primary" onClick={() => { setSelectedPaymentId(record.id); setIsModalVisible(true); }}>Confirm</Button>
+            )
+        }
+    ] : [
+        { title: 'Name', dataIndex: 'fullName', key: 'fullName' },
+        { title: 'Email', dataIndex: 'email', key: 'email' },
+        { title: 'Phone', dataIndex: 'phoneNumber', key: 'phoneNumber' },
+        { title: 'Premium', dataIndex: 'isPremium', render: (isPremium) => <Tag color={isPremium ? 'gold' : 'blue'}>{isPremium ? 'Premium' : 'Regular'}</Tag> },
+        { title: 'Status', dataIndex: 'status', render: (status) => <Tag color={status === 1 ? 'green' : 'red'}>{status === 1 ? 'Active' : 'Banned'}</Tag> },
         {
-            title: 'Email',
-            dataIndex: 'email',
-            key: 'email',
-        },
-        {
-            title: 'Phone',
-            dataIndex: 'phoneNumber',
-            key: 'phoneNumber',
-        },
-        {
-            title: 'Premium',
-            dataIndex: 'isPremium',
-            key: 'isPremium',
-            render: isPremium => <Tag color={isPremium === false ? 'blue' : 'gold'}>{isPremium === false ? 'Regular' : 'Premium'}</Tag>
-        },
-        {
-            title: 'Status',
-            dataIndex: 'status',
-            key: 'status',
-            render: status => <Tag color={status === 1 ? 'green' : 'red'}>{status === 1 ? 'Active' : 'Banned'}</Tag>,
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: (_, record) => (
-                <div>
-                    <Popconfirm
-                        title={`Are you sure you want to ${record.status === 1 ? 'ban' : 'unban'} this user?`}
-                        onConfirm={() => handleToggleBan(record.id, record.status === 1)}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button style={{ color: '#2E5C8A', borderColor: '#2E5C8A' }}>
-                            {record.status === 1
-                                ? <LockFilled style={{ color: '#ff0000' }} />
-                                : <UnlockFilled style={{ color: '#009900' }} />}
-                        </Button>
-                    </Popconfirm>
-                </div>
-            ),
-        },
+            title: 'Action', key: 'action', render: (_, record) => (
+                <Popconfirm title={`Are you sure you want to ${record.status === 1 ? 'ban' : 'unban'} this user?`} onConfirm={() => handleToggleBan(record.id, record.status === 1)}>
+                    <Button>{record.status === 1 ? <LockFilled /> : <UnlockFilled />}</Button>
+                </Popconfirm>
+            )
+        }
     ];
-
-    const pieData = [
-        { name: 'Premium', value: premiumCount },
-        { name: 'Regular', value: regularCount }
-    ];
-
-    const COLORS = ['gold', 'blue'];
 
     return (
         <div style={{ padding: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                <PieChart width={400} height={300}>
-                    <Pie
-                        data={pieData}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={100}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label
-                    >
-                        {pieData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                </PieChart>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3>Chế độ xem:</h3>
+                    <Select value={viewMode} onChange={(value) => setViewMode(value)} style={{ marginLeft: '20px' }}>
+                        <Option value="payments">Quản lý Giao dịch</Option>
+                        <Option value="users">Quản lý Người dùng</Option>
+                    </Select>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h3>Chọn chế độ xem doanh thu:</h3>
+                    <Select value={dateViewMode} onChange={(value) => {
+                        setDateViewMode(value);
+                        calculateRevenueData(payments);
+                    }} style={{ marginLeft: '20px' }}>
+                        <Option value="day">Theo Ngày</Option>
+                        <Option value="month">Theo Tháng</Option>
+                    </Select>
+                </div>
             </div>
 
-            <h1 style={{ textAlign: 'center', color: '#2E5C8A' }}>Quản lý thông tin người dùng</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ width: '48%', height: '300px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                                data={[{ name: 'Premium', value: premiumCount }, { name: 'Regular', value: regularCount }]}
+                                fill="#8884d8"
+                                label
+                            >
+                                <Cell key="cell-premium" fill="#FFD700" />
+                                <Cell key="cell-regular" fill="#1E90FF" />
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+
+                <div style={{ width: '48%', height: '300px' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={revenueData}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="date" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Line type="monotone" dataKey="total" stroke="#82ca9d" />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+            </div>
+
             <Table
-                bordered
-                dataSource={users}
+                title={() => <h1 style={{
+                    textAlign: 'center',
+                    color: '#2E5C8A'
+                }}>{viewMode === 'payments' ? "Quản lý Giao dịch" : "Quản lý Người dùng"}</h1>}
+                dataSource={viewMode === 'payments' ? payments : users}
                 columns={columns}
-                rowKey="id"
                 loading={loading}
                 pagination={false}
-                style={{ marginBottom: '16px' }}
+                rowKey={(record) => record.id || record.id}
             />
 
             <Pagination
                 current={pageNumber}
                 pageSize={pageSize}
                 total={total}
-                onChange={(page, pageSize) => {
+                onChange={(page, size) => {
                     setPageNumber(page);
-                    setPageSize(pageSize);
+                    setPageSize(size);
                 }}
                 showSizeChanger
-                pageSizeOptions={['10', '20', '50']}
                 style={{
                     transform: 'translate(40%, 30%)', marginTop: '16px'
                 }}
             />
+            <Modal title="Xác nhận thanh toán" open={isModalVisible} onOk={handleConfirmPayment} onCancel={() => setIsModalVisible(false)}>
+                <p>Bạn có chắc chắn muốn xác nhận thanh toán này không?</p>
+            </Modal>
         </div>
     );
 }
 
-export default Admin;
+export default AdminAndPayment;
