@@ -31,20 +31,20 @@ function Header({ admin, setAdmin }) {
         {
             key: 'profile',
             label: (
-                <Link to="#profile" style={{ color: '#2E5C8A', fontWeight: 'bold' }}>
-                    <UserOutlined /> Profile
+                <Link to="#profile" style={{ color: '#222', fontWeight: 'bold' }}>
+                    <UserOutlined /> Hồ sơ
                 </Link>
             ),
         },
         {
             key: 'logout',
             label: (
-                <div onClick={showLogoutModal} style={{ color: '#2E5C8A', fontWeight: 'bold' }}>
-                    <LogoutOutlined /> Logout
+                <div onClick={showLogoutModal} style={{ color: '#222', fontWeight: 'bold' }}>
+                    <LogoutOutlined /> Đăng xuất
                 </div>
             ),
         },
-    ]
+    ];
 
     return (
         <header style={styles.header}>
@@ -65,7 +65,7 @@ function Header({ admin, setAdmin }) {
                 <Link to="/travel-destinations" style={styles.navLink}>Mẹo du lịch</Link>
 
                 {admin ? (
-                    <Dropdown menu={{ items }} placement="bottomRight">
+                    <Dropdown menu={{ items, style: styles.dropdownMenu }} placement="bottomRight">
                         <Button style={styles.navButton}>
                             {admin.userName}
                         </Button>
@@ -96,9 +96,9 @@ const styles = {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '10px',
         padding: '10px 20px',
-        boxShadow: 'rgba(0, 0, 0, 0.16) 0px 1px 4px',
+        backgroundColor: '#222',
+        boxShadow: 'rgba(0, 0, 0, 0.5) 0px 1px 4px',
     },
     logoContainer: {
         display: 'flex',
@@ -116,7 +116,7 @@ const styles = {
     },
     brand: {
         fontSize: '24px',
-        color: '#8EACCD',
+        color: '#FFA500',
         fontWeight: 'bold',
     },
     navbar: {
@@ -126,18 +126,22 @@ const styles = {
     navLink: {
         margin: '0 15px',
         textDecoration: 'none',
-        color: '#2E5C8A',
+        color: '#FFA500',
         fontWeight: 'bold',
         fontSize: '16px',
         transition: 'color 0.3s',
     },
     navButton: {
         marginLeft: '15px',
-        backgroundColor: '#2E5C8A',
-        color: '#fff',
+        backgroundColor: '#FFA500',
+        color: '#222',
         border: 'none',
         padding: '10px 15px',
         borderRadius: '5px',
+        fontWeight: 'bold'
+    },
+    dropdownMenu: {
+        backgroundColor: '#FFA500', 
     },
 };
 

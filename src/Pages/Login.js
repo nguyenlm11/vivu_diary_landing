@@ -73,7 +73,7 @@ function LoginPage({ setAdmin }) {
                     style={styles.form}
                 >
                     <Form.Item
-                        label="Tên người dùng"
+                        label={<span style={{ color: '#000' }}>Tên người dùng</span>}
                         name="userName"
                         rules={[{ required: true, message: 'Vui lòng nhập tên người dùng!' }]}
                     >
@@ -81,7 +81,7 @@ function LoginPage({ setAdmin }) {
                     </Form.Item>
 
                     <Form.Item
-                        label="Mật khẩu"
+                        label={<span style={{ color: '#000' }}>Mật khẩu</span>}
                         name="password"
                         rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
                     >
@@ -105,21 +105,27 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
-        background: 'linear-gradient(135deg, #8EACCD, #D2E0FB)',
+        backgroundImage: 'url(images/2_1.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        // background: 'linear-gradient(135deg, #8EACCD, #D2E0FB)',
     },
     loginBox: {
         backgroundColor: '#fff',
         padding: '40px',
         borderRadius: '10px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.8)',
         width: '400px',
         textAlign: 'center',
+        backgroundColor: 'transparent'
     },
     title: {
         fontSize: '28px',
-        color: '#2E5C8A',
+        // color: '#2E5C8A',
+        color: '#800080',
         marginBottom: '30px',
         fontWeight: '600',
+        fontWeight: 'bold'
     },
     form: {
         width: '100%',
@@ -127,9 +133,10 @@ const styles = {
     input: {
         padding: '10px',
         borderRadius: '5px',
+        backgroundColor: 'transparent'
     },
     loginButton: {
-        backgroundColor: '#2E5C8A',
+        backgroundColor: '#800080',
         color: '#fff',
         padding: '10px 15px',
         fontSize: '16px',

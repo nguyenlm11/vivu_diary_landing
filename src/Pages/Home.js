@@ -6,8 +6,6 @@ function Home() {
     return (
         <div>
             <Hero />
-            <br />
-            {/* <Features /> */}
         </div>
     )
 }
