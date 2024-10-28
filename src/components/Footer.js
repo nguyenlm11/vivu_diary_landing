@@ -15,22 +15,22 @@ function Footer() {
             <p style={styles.footerText}>&copy; Vivu Dairy 2024. All Rights Reserved.</p>
         </footer>
     );
-};
+}
 
 const styles = {
     footer: {
-        backgroundColor: '#8EACCD',
+        backgroundColor: '#333',
         padding: '20px',
         textAlign: 'center',
-        color: '#fff'
+        color: '#FFA500',
     },
     footerText: {
-        marginBottom: '10px'
+        marginBottom: '10px',
     },
     socialLink: {
         margin: '0 10px',
         textDecoration: 'none',
-        color: '#fff'
+        color: '#FFA500',
     },
 };
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'antd';
+import { BiBorderBottom } from 'react-icons/bi';
 
 const destinations = [
     {
@@ -167,6 +168,10 @@ const styles = {
     container: {
         padding: '20px',
         textAlign: 'center',
+        backgroundImage: 'url(images/2_1.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        color: '#800080',
     },
     title: {
         fontSize: '32px',
@@ -180,7 +185,7 @@ const styles = {
         gap: '20px',
     },
     card: {
-        backgroundColor: '#ffffff',
+        backgroundColor: '#f9f9f9',
         border: '1px solid #e0e0e0',
         borderRadius: '8px',
         padding: '15px',
@@ -190,6 +195,7 @@ const styles = {
         transition: '0.3s',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
         position: 'relative',
+        backgroundImage: 'url(images/1_1.jpg)',
     },
     cardImage: {
         width: '100%',
@@ -198,14 +204,17 @@ const styles = {
         borderRadius: '8px',
     },
     cardTitle: {
-        fontSize: '20px',
+        fontSize: '24px',
         fontWeight: '600',
-        marginTop: '10px',
+        marginTop: '15px',
+        color: '#800080',
+        fontWeight: 'bold'
     },
     cardDescription: {
         fontSize: '14px',
-        color: '#555',
+        color: '#333',
         marginTop: '5px',
+        fontWeight: 'bold'
     },
 };
 

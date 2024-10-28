@@ -3,10 +3,10 @@ import React, { useState, useEffect } from 'react';
 
 function Hero() {
     const images = [
-        'images/1.jpg',
-        'images/7.jpg',
-        'images/6.jpg',
-        'images/5.jpg'
+        'images/1_1.jpg',
+        'images/7_1.jpg',
+        'images/6_1.jpg',
+        'images/5_1.jpg'
     ];
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -110,7 +110,7 @@ const styles = {
         padding: '20px 35px',
         marginTop: '250px',
         fontSize: '18px',
-        backgroundColor: '#2E5C8A',
+        backgroundColor: '#800080',
         border: 'none',
         color: '#fff',
         cursor: 'pointer',

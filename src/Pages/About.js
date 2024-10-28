@@ -2,11 +2,11 @@ import { Button } from 'antd';
 import React from 'react';
 
 const features = [
-    'images/8.jpg',
-    'images/9.jpg',
-    'images/10.jpg',
-    'images/11.jpg',
-    'images/12.jpg',
+    'images/8_1.jpg',
+    'images/9_1.jpg',
+    'images/10_1.jpg',
+    'images/11_1.jpg',
+    'images/12_1.jpg',
 ];
 
 function About() {
@@ -30,20 +30,20 @@ function About() {
 
 const styles = {
     features: {
-        padding: '10px 10px',
+        // padding: '10px 10px',
     },
     featureItem: {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: '8px',
+        // marginBottom: '8px',
         padding: '20px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
         flexWrap: 'wrap',
         height: '750px',
         backgroundRepeat: 'no-repeat',
         color: '#fff',
-        borderRadius: '10px'
+        // borderRadius: '10px'
     },
     textContainer: {
         flex: '1',
