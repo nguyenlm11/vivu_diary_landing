@@ -66,8 +66,15 @@ function Hero() {
                 </Button>
             </div>
 
-            <Modal title="Tải ứng dụng Vivu Dairy" open={isModalVisible} onCancel={handleCancel} footer={null}>
-                <QRCode value={'https://vivu-dairy/download'} />
+            <Modal
+                title="Tải ứng dụng Vivu Dairy"
+                open={isModalVisible}
+                onCancel={handleCancel}
+                footer={null}
+            >
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <QRCode value={'https://expo.dev/accounts/mtphuc25032003/projects/vivu-diary/builds/6e44ff0e-29bc-42a7-84de-d5aadc79005f'} />
+                </div>
             </Modal>
         </section>
     );
