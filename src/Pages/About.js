@@ -1,15 +1,13 @@
 import { Button } from 'antd';
-import React from 'react';
-
-const features = [
-    'images/8_1.jpg',
-    'images/9_1.jpg',
-    'images/10_1.jpg',
-    'images/11_1.jpg',
-    'images/12_1.jpg',
-];
+import React, { useContext } from 'react';
+import { ThemeContext } from '../context/ThemeContext';
 
 function About() {
+    const { isDarkTheme } = useContext(ThemeContext);
+
+    const features = isDarkTheme
+        ? ['images/8_2.jpg', 'images/9_2.jpg', 'images/10_2.jpg', 'images/11_2.jpg', 'images/12_2.jpg',]
+        : ['images/8.jpg', 'images/9.jpg', 'images/10.jpg', 'images/11.jpg', 'images/12.jpg',]
     return (
         <section style={styles.features}>
             {features.map((imageUrl, index) => (

@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { ThemeContext } from '../context/ThemeContext';
 
-const apiURL = "https://vivudiary.azurewebsites.net/api/Auth/login";
+const apiURL = "https://vivudiaryapi.azurewebsites.net/api/Auth/login";
 
 function LoginPage({ setAdmin }) {
+    const { isDarkTheme } = useContext(ThemeContext);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
@@ -35,7 +37,7 @@ function LoginPage({ setAdmin }) {
                 if (data.userRoleId.includes("Admin")) {
                     message.success('Đăng nhập thành công!');
                     localStorage.setItem('admin', JSON.stringify(data));
-                    localStorage.setItem('accessToken', data.token); // Store access token
+                    localStorage.setItem('accessToken', data.token);
                     setAdmin(data);
                     navigate('/');
                 } else {
@@ -61,9 +63,9 @@ function LoginPage({ setAdmin }) {
     };
 
     return (
-        <div style={styles.container}>
+        <div style={{ ...styles.container, backgroundImage: isDarkTheme ? 'url(images/1_2.jpg)' : 'url(images/1.jpg)' }}>
             <div style={styles.loginBox}>
-                <h2 style={styles.title}>Đăng nhập</h2>
+                <h2 style={{ ...styles.title, color: isDarkTheme ? '#F9F1AA' : '#195F98' }}>Đăng nhập</h2>
                 <Form
                     name="login"
                     layout="vertical"
@@ -89,7 +91,12 @@ function LoginPage({ setAdmin }) {
                     </Form.Item>
 
                     <Form.Item>
-                        <Button type="primary" htmlType="submit" block loading={loading} style={styles.loginButton}>
+                        <Button type="primary" htmlType="submit" block loading={loading}
+                            style={{
+                                ...styles.loginButton,
+                                color: isDarkTheme ? '#000' : '#fff',
+                            backgroundColor: isDarkTheme ? '#F9F1AA' : '#195F98'
+                            }}>
                             Đăng nhập
                         </Button>
                     </Form.Item>
@@ -105,10 +112,8 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
-        backgroundImage: 'url(images/2_1.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        // background: 'linear-gradient(135deg, #8EACCD, #D2E0FB)',
     },
     loginBox: {
         backgroundColor: '#fff',
