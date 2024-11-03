@@ -10,9 +10,20 @@ function AdminAndPayment() {
     const [payments, setPayments] = useState([]);
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [pageNumber, setPageNumber] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
-    const [total, setTotal] = useState(0);
+    const [totalRevenue, setTotalRevenue] = useState(0);
+    const [currentPage, setCurrentPage] = useState({ payments: 1, users: 1 });
+
+
+    // Pagination states for payments
+    const [paymentPageNumber, setPaymentPageNumber] = useState(1);
+    const [paymentPageSize, setPaymentPageSize] = useState(10);
+    const [paymentTotal, setPaymentTotal] = useState(0);
+
+    // Pagination states for users
+    const [userPageNumber, setUserPageNumber] = useState(1);
+    const [userPageSize, setUserPageSize] = useState(10);
+    const [userTotal, setUserTotal] = useState(0);
+
     const [userNames, setUserNames] = useState({});
     const [revenueData, setRevenueData] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -34,24 +45,54 @@ function AdminAndPayment() {
         } else {
             fetchUsers();
         }
-        calculateRevenueData(payments);
-    }, [viewMode, pageNumber, pageSize, dateViewMode]);
 
+        if (viewMode === 'payments') {
+            calculateRevenueData(payments);
+        }
+    }, [viewMode, paymentPageNumber, paymentPageSize, userPageNumber, userPageSize, dateViewMode]);
+
+    const calculateTotalRevenue = (paymentsData) => {
+        const total = paymentsData.reduce((acc, payment) => {
+            return payment.paymentStatus === 2 ? acc + payment.total : acc;
+        }, 0);
+        setTotalRevenue(total);
+    };
+
+
+    const fetchAllPayments = async (pageNumber = 1, accumulatedPayments = []) => {
+        try {
+            const token = localStorage.getItem('accessToken');
+            const response = await axios.get(`https://vivudiaryapi.azurewebsites.net/api/Payment/payments?pageNumber=${pageNumber}&pageSize=10`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const { data, totalItems } = response.data.data;
+
+            const newAccumulatedPayments = [...accumulatedPayments, ...data];
+
+            if (newAccumulatedPayments.length < totalItems) {
+                return fetchAllPayments(pageNumber + 1, newAccumulatedPayments);
+            } else {
+                return newAccumulatedPayments;
+            }
+        } catch (error) {
+            message.error('Không thể lấy dữ liệu thanh toán');
+            return accumulatedPayments;
+        }
+    };
 
     const fetchPayments = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('accessToken');
-            const response = await axios.get(`https://vivudiary.azurewebsites.net/api/Payment/payments?pageNumber=${pageNumber}&pageSize=${pageSize}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const paymentsData = response.data.data.data;
-            setPayments(paymentsData);
-            setTotal(response.data.data.totalItems);
-            paymentsData.forEach(payment => fetchUserName(payment.customerId));
-            calculateRevenueData(paymentsData);
+            const allPayments = await fetchAllPayments();
+            setPayments(allPayments.slice((currentPage.payments - 1) * paymentPageSize, currentPage.payments * paymentPageSize));
+            setPaymentTotal(allPayments.length);
+            if (viewMode === 'payments') {
+                calculateRevenueData(allPayments);
+                calculateTotalRevenue(allPayments);
+            }
+            allPayments.forEach(payment => fetchUserName(payment.customerId));
         } catch (error) {
-            message.error('Failed to fetch payments');
+            message.error('Không thể lấy tất cả dữ liệu thanh toán');
         } finally {
             setLoading(false);
         }
@@ -60,7 +101,7 @@ function AdminAndPayment() {
     const fetchUserName = async (customerId) => {
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await axios.get(`https://vivudiary.azurewebsites.net/api/User/searchBy${customerId}`, {
+            const response = await axios.get(`https://vivudiaryapi.azurewebsites.net/api/User/searchBy${customerId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUserNames(prevState => ({
@@ -83,18 +124,23 @@ function AdminAndPayment() {
                 revenueMap[key] = (revenueMap[key] || 0) + payment.total;
             }
         });
-        setRevenueData(Object.keys(revenueMap).map(key => ({ date: key, total: revenueMap[key] })));
+        const sortedRevenueData = Object.keys(revenueMap)
+            .map(key => ({ date: key, total: revenueMap[key] }))
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        setRevenueData(sortedRevenueData);
     };
 
     const fetchUsers = async () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await axios.get(`https://vivudiary.azurewebsites.net/api/User/getAllUsers?pageNumber=${pageNumber}&pageSize=${pageSize}`, {
+            const response = await axios.get(`https://vivudiaryapi.azurewebsites.net/api/User/getAllUsers?pageNumber=${currentPage.users}&pageSize=${userPageSize}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setUsers(response.data.data.results);
-            setTotal(response.data.data.totalCount);
+            const allUsers = response.data.data.results.filter(user => user.roles.includes("User"));
+            setUsers(allUsers);
+            setUserTotal(response.data.data.totalCount);
         } catch (error) {
             message.error('Failed to fetch users');
         } finally {
@@ -105,12 +151,12 @@ function AdminAndPayment() {
     const fetchUserStatistics = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await axios.get(`https://vivudiary.azurewebsites.net/api/User/getAllUsers?pageNumber=1&pageSize=10000`, {
+            const response = await axios.get(`https://vivudiaryapi.azurewebsites.net/api/User/getAllUsers?pageNumber=1&pageSize=10000`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            const allUsers = response.data.data.results;
+            const allUsers = response.data.data.results.filter(user => user.roles.includes("User"));
             setPremiumCount(allUsers.filter(user => user.isPremium).length);
-            setRegularCount(allUsers.length - premiumCount);
+            setRegularCount(allUsers.filter(user => !user.isPremium).length);
         } catch (error) {
             message.error('Error fetching user statistics');
         }
@@ -119,7 +165,7 @@ function AdminAndPayment() {
     const handleConfirmPayment = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            await axios.put(`https://vivudiary.azurewebsites.net/api/Payment/confirm?id=${selectedPaymentId}`, {}, {
+            await axios.put(`https://vivudiaryapi.azurewebsites.net/api/Payment/confirm?id=${selectedPaymentId}`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             message.success('Payment confirmed successfully');
@@ -134,8 +180,8 @@ function AdminAndPayment() {
         try {
             const token = localStorage.getItem('accessToken');
             const apiUrl = isActive
-                ? `https://vivudiary.azurewebsites.net/api/User/ban/${id}`
-                : `https://vivudiary.azurewebsites.net/api/User/unban/${id}`;
+                ? `https://vivudiaryapi.azurewebsites.net/api/User/ban/${id}`
+                : `https://vivudiaryapi.azurewebsites.net/api/User/unban/${id}`;
             await axios.put(apiUrl, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -164,14 +210,15 @@ function AdminAndPayment() {
         { title: 'Premium', dataIndex: 'isPremium', render: (isPremium) => <Tag color={isPremium ? 'gold' : 'blue'}>{isPremium ? 'Premium' : 'Regular'}</Tag> },
         { title: 'Status', dataIndex: 'status', render: (status) => <Tag color={status === 1 ? 'green' : 'red'}>{status === 1 ? 'Active' : 'Banned'}</Tag> },
         {
-            title: 'Action', key: 'action', render: (_, record) => (
+            title: 'Action',
+            key: 'action',
+            render: (_, record) => (
                 <Popconfirm title={`Are you sure you want to ${record.status === 1 ? 'ban' : 'unban'} this user?`} onConfirm={() => handleToggleBan(record.id, record.status === 1)}>
                     <Button>{record.status === 1 ? <LockFilled /> : <UnlockFilled />}</Button>
                 </Popconfirm>
             )
         }
     ];
-
     return (
         <div style={{ padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -227,6 +274,17 @@ function AdminAndPayment() {
                 </div>
             </div>
 
+            <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                <div style={{ textAlign: 'center' }}>
+                    <h2>Total User</h2>
+                    <h4 style={{ color: '#2E5C8A' }}>{userTotal - 4}</h4>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                    <h2>Total Revenue</h2>
+                    <h4 style={{ color: '#45A022' }}>{totalRevenue.toLocaleString()} VNĐ</h4>
+                </div>
+            </div>
+
             <Table
                 title={() => <h1 style={{
                     textAlign: 'center',
@@ -240,16 +298,25 @@ function AdminAndPayment() {
             />
 
             <Pagination
-                current={pageNumber}
-                pageSize={pageSize}
-                total={total}
-                onChange={(page, size) => {
-                    setPageNumber(page);
-                    setPageSize(size);
+                current={viewMode === 'payments' ? paymentPageNumber : userPageNumber}
+                pageSize={viewMode === 'payments' ? paymentPageSize : userPageSize}
+                total={viewMode === 'payments' ? paymentTotal : userTotal}
+                onChange={(page, pageSize) => {
+                    setCurrentPage(prev => ({ ...prev, [viewMode]: page }));
+                    if (viewMode === 'payments') {
+                        setPaymentPageNumber(page);
+                        setPaymentPageSize(pageSize);
+                    } else {
+                        setUserPageNumber(page);
+                        setUserPageSize(pageSize);
+                    }
                 }}
+
                 showSizeChanger
                 style={{
-                    transform: 'translate(40%, 30%)', marginTop: '16px'
+                    transform: 'translate(43%, 50%)',
+                    marginTop: '16px',
+                    position: 'relative'
                 }}
             />
             <Modal title="Xác nhận thanh toán" open={isModalVisible} onOk={handleConfirmPayment} onCancel={() => setIsModalVisible(false)}>

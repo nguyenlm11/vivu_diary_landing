@@ -1,13 +1,13 @@
 import { Button, QRCode } from 'antd';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { ThemeContext } from '../context/ThemeContext';
 
 function Hero() {
-    const images = [
-        'images/1_1.jpg',
-        'images/7_1.jpg',
-        'images/6_1.jpg',
-        'images/5_1.jpg'
-    ];
+    const { isDarkTheme } = useContext(ThemeContext);
+
+    const images = isDarkTheme
+        ? ['images/1_2.jpg', 'images/7_2.jpg', 'images/6_2.jpg', 'images/5_2.jpg']
+        : ['images/1.jpg', 'images/7.jpg', 'images/6.jpg', 'images/5.jpg'];
 
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -28,12 +28,12 @@ function Hero() {
 
     const showModal = () => {
         setIsModalVisible(true);
-        setTimeout(() => setModalTransition(true), 10); // Bắt đầu hiệu ứng trượt
+        setTimeout(() => setModalTransition(true), 10);
     };
 
     const closeModal = () => {
-        setModalTransition(false); // Kích hoạt hiệu ứng trượt đóng
-        setTimeout(() => setIsModalVisible(false), 300); // Đợi hiệu ứng trượt trước khi ẩn hoàn toàn
+        setModalTransition(false);
+        setTimeout(() => setIsModalVisible(false), 300);
     };
 
     return (
@@ -64,7 +64,14 @@ function Hero() {
                 />
             </div>
             <div style={styles.heroContent}>
-                <Button style={styles.heroButton} onClick={showModal}>
+                <Button style={{
+                    ...styles.heroButton,
+                    backgroundColor: isDarkTheme ? '#F9F1AA' : '#195F98',
+                    color: isDarkTheme ? '#000' : '#fff',
+                    fontWeight: '620'
+                }}
+                    onClick={showModal}
+                >
                     Bắt đầu
                 </Button>
             </div>
@@ -78,11 +85,11 @@ function Hero() {
                             transform: modalTransition ? 'translateY(0)' : 'translateY(-20px)',
                         }}
                     >
-                        <h2 style={{color: "#800080"}}>Tải ứng dụng Vivu Dairy</h2>
+                        <h2 style={{ color: "#295F98" }}>Tải ứng dụng Vivu Dairy</h2>
                         <div style={styles.qrWrapper}>
-                            <QRCode 
-                            color='#000'
-                            value={'https://expo.dev/accounts/mtphuc25032003/projects/vivu-diary/builds/6e44ff0e-29bc-42a7-84de-d5aadc79005f'} 
+                            <QRCode
+                                color='#000'
+                                value={'https://expo.dev/accounts/mtphuc25032003/projects/vivu-diary/builds/a0a07629-937e-42f9-818a-987d05d5a4d1'}
                             />
                         </div>
                         <Button onClick={closeModal} style={styles.closeButton}>
@@ -100,8 +107,8 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '100px 20px',
-        height: '500px',
+        padding: '50px 20px',
+        height: '600px',
         color: '#fff',
         textAlign: 'center',
         overflow: 'hidden',
@@ -119,7 +126,7 @@ const styles = {
     },
     heroImage: {
         width: '100%',
-        backgroundSize: 'cover',
+        backgroundSize: '100% 750px',
         backgroundPosition: 'center',
         height: '100%',
     },
@@ -151,9 +158,6 @@ const styles = {
         zIndex: 1000,
     },
     modalContent: {
-        // backgroundImage: 'url(images/2_1.jpg)',
-        // backgroundSize: 'cover',
-        // backgroundPosition: 'center',
         backgroundColor: '#fff',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.8)',
         padding: '30px',
@@ -171,7 +175,7 @@ const styles = {
         margin: '20px 0',
     },
     closeButton: {
-        backgroundColor: '#800080',
+        backgroundColor: '#295F98',
         color: '#fff',
         marginTop: '15px',
         padding: '10px 20px',

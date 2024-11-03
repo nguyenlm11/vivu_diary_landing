@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Modal, Button } from 'antd';
 import { BiBorderBottom } from 'react-icons/bi';
+import { ThemeContext } from '../context/ThemeContext';
 
 const destinations = [
     {
@@ -116,6 +117,7 @@ const destinations = [
 function TravelDestinations() {
     const [visible, setVisible] = useState(false);
     const [selectedDestination, setSelectedDestination] = useState(null);
+    const { isDarkTheme } = useContext(ThemeContext);
 
     const showModal = (destination) => {
         setSelectedDestination(destination);
@@ -130,14 +132,14 @@ function TravelDestinations() {
     const sortedDestinations = destinations.sort((a, b) => a.name.localeCompare(b.name));
 
     return (
-        <div style={styles.container}>
-            <h1 style={styles.title}>Mẹo du lịch tại một số địa điểm</h1>
+        <div style={{ ...styles.container, backgroundImage: !isDarkTheme ? 'url(images/1.jpg)' : 'url(images/1_2.jpg)', }}>
+            <h1 style={{ ...styles.title, color: isDarkTheme ? '#F9F1AA' : '#195F98' }}>Mẹo du lịch tại một số địa điểm</h1>
             <div style={styles.cardContainer}>
                 {sortedDestinations.map((destination, index) => (
-                    <div key={index} style={styles.card} onClick={() => showModal(destination)}>
+                    <div key={index} style={{ ...styles.card, backgroundImage: !isDarkTheme ? 'url(images/1.jpg)' : 'url(images/1_2.jpg)', }} onClick={() => showModal(destination)}>
                         <img src={destination.image} alt={destination.name} style={styles.cardImage} />
-                        <h3 style={styles.cardTitle}>{destination.name}</h3>
-                        <p style={styles.cardDescription}>{destination.description}</p>
+                        <h3 style={{ ...styles.cardTitle, color: isDarkTheme ? '#F9F1AA' : '#195F98' }} onClick={() => showModal(destination)}>{destination.name}</h3>
+                        <p style={{ ...styles.cardDescription, color: isDarkTheme ? '#fff' : '#111' }}>{destination.description}</p>
                     </div>
                 ))}
             </div>
@@ -168,14 +170,13 @@ const styles = {
     container: {
         padding: '20px',
         textAlign: 'center',
-        backgroundImage: 'url(images/2_1.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         color: '#800080',
     },
     title: {
         fontSize: '32px',
-        fontWeight: 'bold',
+        fontWeight: '650',
         marginBottom: '30px',
     },
     cardContainer: {
@@ -195,7 +196,6 @@ const styles = {
         transition: '0.3s',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
         position: 'relative',
-        backgroundImage: 'url(images/1_1.jpg)',
     },
     cardImage: {
         width: '100%',
@@ -205,7 +205,7 @@ const styles = {
     },
     cardTitle: {
         fontSize: '24px',
-        fontWeight: '600',
+        fontWeight: '650',
         marginTop: '15px',
         color: '#800080',
         fontWeight: 'bold'

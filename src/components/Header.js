@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { Button, Dropdown, message, Modal } from 'antd';
+import React, { useContext, useState } from 'react';
+import { Button, Dropdown, message, Modal, Switch } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
+import { ThemeContext } from '../context/ThemeContext';
 
 function Header({ admin, setAdmin }) {
+    const { isDarkTheme, toggleTheme } = useContext(ThemeContext);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const navigate = useNavigate();
 
@@ -31,7 +33,7 @@ function Header({ admin, setAdmin }) {
         {
             key: 'profile',
             label: (
-                <Link to="#profile" style={{ color: '#222', fontWeight: 'bold' }}>
+                <Link to="#profile" style={{ color: isDarkTheme ? '#111' : '#fff', fontWeight: 'bold' }}>
                     <UserOutlined /> Hồ sơ
                 </Link>
             ),
@@ -39,42 +41,94 @@ function Header({ admin, setAdmin }) {
         {
             key: 'logout',
             label: (
-                <div onClick={showLogoutModal} style={{ color: '#222', fontWeight: 'bold' }}>
+                <div onClick={showLogoutModal} style={{ color: isDarkTheme ? '#111' : '#fff', fontWeight: 'bold' }}>
                     <LogoutOutlined /> Đăng xuất
                 </div>
+            ),
+        },
+        {
+            key: 'Mode',
+            label: (
+                <Switch
+                    checked={isDarkTheme}
+                    onChange={toggleTheme}
+                    checkedChildren="Tối"
+                    unCheckedChildren="Sáng"
+                    style={{
+                        backgroundColor: isDarkTheme ? '#000' : '#ddd',
+                        alignItems: 'center'
+                    }}
+                />
+            ),
+        }
+    ];
+
+    const items_2 = [
+        {
+            key: 'Mode',
+            label: (
+                <Switch
+                    checked={isDarkTheme}
+                    onChange={toggleTheme}
+                    checkedChildren="Tối"
+                    unCheckedChildren="Sáng"
+                    style={{
+                        backgroundColor: isDarkTheme ? '#000' : '#ddd',
+                    }}
+                />
             ),
         },
     ];
 
     return (
-        <header style={styles.header}>
+        <header style={{
+            ...styles.header,
+            backgroundImage: isDarkTheme ? 'url(images/2_2.jpg)' : 'url(images/.jpg'
+        }}>
             <div style={styles.logoContainer}>
                 <Link to="/" style={styles.logoLink}>
-                    <img style={styles.logo} src="images/logo.jpg" alt="Vivu Dairy Logo" />
-                    <span style={styles.brand}>Vivu Dairy</span>
+                    <img style={styles.logo} src={!isDarkTheme ? "images/logo.jpg" : "images/logo_1.jpg"} alt="Vivu Dairy Logo" />
+                    <span style={{ ...styles.brand, color: isDarkTheme ? '#F9F1AA' : '#8EACCD' }}>Vivu Dairy</span>
                 </Link>
             </div>
             <nav style={styles.navbar}>
                 {admin && (
                     <>
-                        <Link to="/admin" style={styles.navLink}>Quản lý</Link>
-                        {/* <Link to="/payment" style={styles.navLink}>Giao dịch</Link> */}
+                        <Link to="/admin" style={{ ...styles.navLink, color: isDarkTheme ? '#F9F1AA' : '#8EACCD' }}>Quản lý</Link>
                     </>
                 )}
-                <Link to="/about" style={styles.navLink}>Giới thiệu</Link>
-                <Link to="/travel-destinations" style={styles.navLink}>Mẹo du lịch</Link>
+                <Link to="/about" style={{ ...styles.navLink, color: isDarkTheme ? '#F9F1AA' : '#8EACCD' }}>Giới thiệu</Link>
+                <Link to="/travel-destinations" style={{ ...styles.navLink, color: isDarkTheme ? '#F9F1AA' : '#8EACCD' }}>Mẹo du lịch</Link>
 
                 {admin ? (
-                    <Dropdown menu={{ items, style: styles.dropdownMenu }} placement="bottomRight">
-                        <Button style={styles.navButton}>
+                    <Dropdown menu={{ items, style: { backgroundColor: isDarkTheme ? '#F9F1AA' : '#8EACCD' } }} placement="bottomRight">
+                        <Button style={{
+                            ...styles.navButton,
+                            backgroundColor: isDarkTheme ? '#F9F1AA' : '#8EACCD',
+                            color: isDarkTheme ? '#111' : '#fff',
+                        }}>
                             {admin.userName}
                         </Button>
                     </Dropdown>
                 ) : (
-                    <Link to="/login">
-                        <Button style={styles.navButton}>Đăng nhập</Button>
-                    </Link>
+                    <Dropdown menu={{
+                        items: [items_2[0]], style: {
+                            backgroundColor: isDarkTheme ? '#F9F1AA' : '#8EACCD',
+                            color: isDarkTheme ? '#111' : '#fff'
+                        }
+                    }} placement="bottomRight">
+                        <Link to="/login">
+                            <Button style={{
+                                ...styles.navButton,
+                                backgroundColor: isDarkTheme ? '#F9F1AA' : '#8EACCD',
+                                color: isDarkTheme ? '#111' : '#fff'
+                            }}>
+                                Đăng nhập
+                            </Button>
+                        </Link>
+                    </Dropdown>
                 )}
+
             </nav>
 
             <Modal
@@ -87,7 +141,7 @@ function Header({ admin, setAdmin }) {
             >
                 <p>Bạn có chắc chắn muốn đăng xuất không?</p>
             </Modal>
-        </header>
+        </header >
     );
 }
 
@@ -97,8 +151,9 @@ const styles = {
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '10px 20px',
-        backgroundColor: '#222',
-        boxShadow: 'rgba(0, 0, 0, 0.5) 0px 1px 4px',
+        boxShadow: 'rgba(0, 0, 0, 0.5) 0px 2px 7px',
+        position: 'relative',
+        zIndex: 1000,
     },
     logoContainer: {
         display: 'flex',
@@ -116,8 +171,7 @@ const styles = {
     },
     brand: {
         fontSize: '24px',
-        color: '#FFA500',
-        fontWeight: 'bold',
+        fontWeight: '850',
     },
     navbar: {
         display: 'flex',
@@ -127,21 +181,17 @@ const styles = {
         margin: '0 15px',
         textDecoration: 'none',
         color: '#FFA500',
-        fontWeight: 'bold',
+        fontWeight: '850',
         fontSize: '16px',
         transition: 'color 0.3s',
     },
     navButton: {
         marginLeft: '15px',
-        backgroundColor: '#FFA500',
         color: '#222',
         border: 'none',
         padding: '10px 15px',
         borderRadius: '5px',
         fontWeight: 'bold'
-    },
-    dropdownMenu: {
-        backgroundColor: '#FFA500', 
     },
 };
 
