@@ -291,7 +291,7 @@ function AdminAndPayment() {
                     <h4 style={{ color: '#2E5C8A' }}>{userTotal - 4}</h4>
                 </div>
 
-                <div style={{ textAlign: 'center', marginLeft: 50 }}>
+                <div style={{ textAlign: 'center',  }}>
                     <h2>Tổng giao dịch</h2>
                     <h4 style={{ color: '#FF5733' }}>{premiumCount}</h4>
                 </div>
