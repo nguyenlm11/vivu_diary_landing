@@ -11,8 +11,9 @@ function Header({ admin, setAdmin }) {
 
     const handleLogout = () => {
         localStorage.removeItem('admin');
-        message.success('Đăng xuất thành công!');
+        localStorage.removeItem('accessToken');
         setAdmin(null);
+        message.success('Đăng xuất thành công!');
         navigate('/');
     };
 
