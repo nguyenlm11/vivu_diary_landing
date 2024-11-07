@@ -16,8 +16,9 @@ function About() {
                     style={{
                         ...styles.featureItem,
                         backgroundImage: `url(${imageUrl})`,
-                        backgroundSize: 'cover',
+                        backgroundSize: 'contain',
                         backgroundPosition: 'center',
+                        backgroundColor: isDarkTheme ? '#000841' : "#EEF5FF"
                     }}
                 >
                 </div>
@@ -36,7 +37,7 @@ const styles = {
         alignItems: 'center',
         // marginBottom: '8px',
         padding: '20px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
         flexWrap: 'wrap',
         height: '750px',
         backgroundRepeat: 'no-repeat',

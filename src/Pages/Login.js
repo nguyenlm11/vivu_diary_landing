@@ -128,18 +128,18 @@ const styles = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        height: '100vh',
-        backgroundSize: 'cover',
+        height: '115vh',
+        backgroundSize: 'contain',
         backgroundPosition: 'center',
     },
     loginBox: {
-        backgroundColor: '#fff',
+        backgroundColor: 'rgba(255, 255, 255, 0.88)',
         padding: '40px',
         borderRadius: '10px',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.8)',
         width: '400px',
         textAlign: 'center',
-        backgroundColor: 'transparent'
+        // backgroundColor: 'transparent'
     },
     title: {
         fontSize: '28px',

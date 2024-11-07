@@ -126,10 +126,10 @@ const styles = {
         left: 0,
     },
     heroImage: {
-        width: '100%',
+        width: '50%',
         backgroundSize: '100% 750px',
         backgroundPosition: 'center',
-        height: '100%',
+        height: 'auto',
     },
     heroContent: {
         maxWidth: '600px',
