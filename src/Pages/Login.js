@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 import { ThemeContext } from '../context/ThemeContext';
 
 const apiURL = "https://vivudiaryapi.azurewebsites.net/api/Auth/login";
@@ -11,16 +12,32 @@ function LoginPage({ setAdmin }) {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    // Check token expiration and handle automatic logout
     useEffect(() => {
         const adminData = localStorage.getItem('admin');
-        if (adminData) {
+        const token = localStorage.getItem('accessToken');
+
+        if (adminData && token) {
             const parsedData = JSON.parse(adminData);
-            if (parsedData && parsedData.userRoleId.includes("Admin")) {
+            const decodedToken = jwtDecode(token);
+
+            if (decodedToken.exp * 1000 < Date.now()) {
+                // Token expired
+                message.warning('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                handleLogout();
+            } else if (parsedData.userRoleId.includes("Admin")) {
                 setAdmin(parsedData);
                 navigate('/');
             }
         }
     }, [navigate, setAdmin]);
+
+    const handleLogout = () => {
+        localStorage.removeItem('admin');
+        localStorage.removeItem('accessToken');
+        setAdmin(null);
+        navigate('/login');
+    };
 
     const onFinish = async (values) => {
         setLoading(true);
@@ -95,7 +112,7 @@ function LoginPage({ setAdmin }) {
                             style={{
                                 ...styles.loginButton,
                                 color: isDarkTheme ? '#000' : '#fff',
-                            backgroundColor: isDarkTheme ? '#F9F1AA' : '#195F98'
+                                backgroundColor: isDarkTheme ? '#F9F1AA' : '#195F98'
                             }}>
                             Đăng nhập
                         </Button>
@@ -126,10 +143,8 @@ const styles = {
     },
     title: {
         fontSize: '28px',
-        // color: '#2E5C8A',
         color: '#800080',
         marginBottom: '30px',
-        fontWeight: '600',
         fontWeight: 'bold'
     },
     form: {
