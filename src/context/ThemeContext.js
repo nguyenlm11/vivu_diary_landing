@@ -17,8 +17,8 @@ export const ThemeProvider = ({ children }) => {
 
     useEffect(() => {
         setThemeBasedOnTime();
-        const interval = setInterval(setThemeBasedOnTime, 60 * 1000); // Kiểm tra mỗi phút
-        return () => clearInterval(interval); // Dọn dẹp interval khi component unmount
+        // const interval = setInterval(setThemeBasedOnTime, 60 * 1000); // Kiểm tra mỗi phút
+        // return () => clearInterval(interval); // Dọn dẹp interval khi component unmount
     }, []);
 
     return (
