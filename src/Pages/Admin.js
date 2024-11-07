@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Tag, message, Button, Popconfirm, Pagination, Modal, Select } from 'antd';
+import { Table, Tag, message, Button, Popconfirm, Pagination, Modal, Select, DatePicker } from 'antd';
 import { DeleteOutlined, LockFilled, UnlockFilled } from '@ant-design/icons';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -11,8 +12,10 @@ function AdminAndPayment() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [totalRevenue, setTotalRevenue] = useState(0);
+    const [dailyTransactionCount, setDailyTransactionCount] = useState(0);
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [transactionCount, setTransactionCount] = useState(0);
     const [currentPage, setCurrentPage] = useState({ payments: 1, users: 1 });
-
 
     // Pagination states for payments
     const [paymentPageNumber, setPaymentPageNumber] = useState(1);
@@ -58,6 +61,13 @@ function AdminAndPayment() {
         setTotalRevenue(total);
     };
 
+    const countDailyPayments = (paymentsData) => {
+        const count = paymentsData.filter(payment => {
+            const paymentDate = new Date(payment.paymentId).toISOString().split('T')[0];
+            return paymentDate === selectedDate;
+        }).length;
+        setDailyTransactionCount(count);
+    };
 
     const fetchAllPayments = async (pageNumber = 1, accumulatedPayments = []) => {
         try {
@@ -91,6 +101,7 @@ function AdminAndPayment() {
                 calculateTotalRevenue(allPayments);
             }
             allPayments.forEach(payment => fetchUserName(payment.customerId));
+            countDailyPayments(allPayments); // Tính tổng số giao dịch trong ngày
         } catch (error) {
             message.error('Không thể lấy tất cả dữ liệu thanh toán');
         } finally {
@@ -263,7 +274,7 @@ function AdminAndPayment() {
                 <div style={{ width: '48%', height: '300px' }}>
                     <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={revenueData}>
-                            <CartesianGrid strokeDasharray="3 3" />
+                            <CartesianGrid strokeDasharray="1 1" />
                             <XAxis dataKey="date" />
                             <YAxis />
                             <Tooltip />
@@ -274,13 +285,19 @@ function AdminAndPayment() {
                 </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
                 <div style={{ textAlign: 'center' }}>
-                    <h2>Total User</h2>
+                    <h2>Tổng người dùng</h2>
                     <h4 style={{ color: '#2E5C8A' }}>{userTotal - 4}</h4>
                 </div>
+
+                <div style={{ textAlign: 'center', marginLeft: 50 }}>
+                    <h2>Tổng giao dịch</h2>
+                    <h4 style={{ color: '#FF5733' }}>{premiumCount}</h4>
+                </div>
+
                 <div style={{ textAlign: 'center' }}>
-                    <h2>Total Revenue</h2>
+                    <h2>Tổng doanh thu</h2>
                     <h4 style={{ color: '#45A022' }}>{totalRevenue.toLocaleString()} VNĐ</h4>
                 </div>
             </div>
@@ -294,7 +311,7 @@ function AdminAndPayment() {
                 columns={columns}
                 loading={loading}
                 pagination={false}
-                rowKey={(record) => record.id || record.id}
+                rowKey={(record) => record.paymentId || record.id}
             />
 
             <Pagination
@@ -315,10 +332,12 @@ function AdminAndPayment() {
                 showSizeChanger
                 style={{
                     transform: 'translate(43%, 50%)',
-                    marginTop: '16px',
+                    marginTop: 16,
+                    marginBottom: 20,
                     position: 'relative'
                 }}
             />
+
             <Modal title="Xác nhận thanh toán" open={isModalVisible} onOk={handleConfirmPayment} onCancel={() => setIsModalVisible(false)}>
                 <p>Bạn có chắc chắn muốn xác nhận thanh toán này không?</p>
             </Modal>

@@ -72,7 +72,7 @@ function Hero() {
                 }}
                     onClick={showModal}
                 >
-                    Bắt đầu
+                    TẢI NGAY
                 </Button>
             </div>
 
@@ -108,11 +108,12 @@ const styles = {
         alignItems: 'center',
         justifyContent: 'center',
         padding: '50px 20px',
-        height: '600px',
+        height: '650px',
         color: '#fff',
         textAlign: 'center',
         overflow: 'hidden',
         position: 'relative',
+        zIndex: 10,
     },
     slider: {
         display: 'flex',
@@ -136,7 +137,7 @@ const styles = {
         zIndex: 1,
     },
     heroButton: {
-        padding: '20px 35px',
+        padding: '32px 32px',
         marginTop: '250px',
         fontSize: '18px',
         backgroundColor: '#800080',

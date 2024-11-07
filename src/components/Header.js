@@ -83,28 +83,28 @@ function Header({ admin, setAdmin }) {
     return (
         <header style={{
             ...styles.header,
-            backgroundImage: isDarkTheme ? 'url(images/2_2.jpg)' : 'url(images/.jpg'
+            backgroundImage: isDarkTheme ? 'url(images/background.jpg)' : 'url(images/.jpg)',
         }}>
             <div style={styles.logoContainer}>
                 <Link to="/" style={styles.logoLink}>
-                    <img style={styles.logo} src={!isDarkTheme ? "images/logo.jpg" : "images/logo_1.jpg"} alt="Vivu Dairy Logo" />
-                    <span style={{ ...styles.brand, color: isDarkTheme ? '#F9F1AA' : '#8EACCD' }}>Vivu Dairy</span>
+                    <img style={styles.logo} src={!isDarkTheme ? "images/logo.jpg" : "images/logo_2.jpg"} alt="Vivu Diary Logo" />
+                    <span style={{ ...styles.brand, color: isDarkTheme ? '#FFFFFF' : '#8EACCD' }}>Vivu Diary</span>
                 </Link>
             </div>
             <nav style={styles.navbar}>
                 {admin && (
                     <>
-                        <Link to="/admin" style={{ ...styles.navLink, color: isDarkTheme ? '#F9F1AA' : '#8EACCD' }}>Quản lý</Link>
+                        <Link to="/admin" style={{ ...styles.navLink, color: isDarkTheme ? '#FFFFFF' : '#8EACCD' }}>Quản lý</Link>
                     </>
                 )}
-                <Link to="/about" style={{ ...styles.navLink, color: isDarkTheme ? '#F9F1AA' : '#8EACCD' }}>Giới thiệu</Link>
-                <Link to="/travel-destinations" style={{ ...styles.navLink, color: isDarkTheme ? '#F9F1AA' : '#8EACCD' }}>Mẹo du lịch</Link>
+                <Link to="/about" style={{ ...styles.navLink, color: isDarkTheme ? '#FFFFFF' : '#8EACCD' }}>Giới thiệu</Link>
+                <Link to="/travel-destinations" style={{ ...styles.navLink, color: isDarkTheme ? '#FFFFFF' : '#8EACCD' }}>Mẹo du lịch</Link>
 
                 {admin ? (
-                    <Dropdown menu={{ items, style: { backgroundColor: isDarkTheme ? '#F9F1AA' : '#8EACCD' } }} placement="bottomRight">
+                    <Dropdown menu={{ items, style: { backgroundColor: isDarkTheme ? '#FFFFFF' : '#8EACCD' } }} placement="bottomRight">
                         <Button style={{
                             ...styles.navButton,
-                            backgroundColor: isDarkTheme ? '#F9F1AA' : '#8EACCD',
+                            backgroundColor: isDarkTheme ? '#FFFFFF' : '#8EACCD',
                             color: isDarkTheme ? '#111' : '#fff',
                         }}>
                             {admin.userName}
@@ -113,14 +113,14 @@ function Header({ admin, setAdmin }) {
                 ) : (
                     <Dropdown menu={{
                         items: [items_2[0]], style: {
-                            backgroundColor: isDarkTheme ? '#F9F1AA' : '#8EACCD',
+                            backgroundColor: isDarkTheme ? '#FFFFFF' : '#8EACCD',
                             color: isDarkTheme ? '#111' : '#fff'
                         }
                     }} placement="bottomRight">
                         <Link to="/login">
                             <Button style={{
                                 ...styles.navButton,
-                                backgroundColor: isDarkTheme ? '#F9F1AA' : '#8EACCD',
+                                backgroundColor: isDarkTheme ? '#FFFFFF' : '#8EACCD',
                                 color: isDarkTheme ? '#111' : '#fff'
                             }}>
                                 Đăng nhập
@@ -151,7 +151,7 @@ const styles = {
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '10px 20px',
-        boxShadow: 'rgba(0, 0, 0, 0.5) 0px 2px 7px',
+        boxShadow: 'rgba(0, 0, 0, 0.5) 0px 2px 8px',
         position: 'relative',
         zIndex: 1000,
     },
