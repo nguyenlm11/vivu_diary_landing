@@ -248,10 +248,15 @@ function AdminAndPayment() {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h3>Chọn chế độ xem doanh thu:</h3>
-                    <Select value={dateViewMode} onChange={(value) => {
-                        setDateViewMode(value);
-                        calculateRevenueData(payments);
-                    }} style={{ marginLeft: '20px' }}>
+                    <Select
+                        value={dateViewMode}
+                        onChange={(value) => {
+                            setDateViewMode(value);
+                            calculateRevenueData(payments);
+                        }}
+                        style={{ marginLeft: '20px' }}
+                        disabled={viewMode !== 'payments'}
+                    >
                         <Option value="day">Theo Ngày</Option>
                         <Option value="month">Theo Tháng</Option>
                     </Select>
@@ -342,7 +347,7 @@ function AdminAndPayment() {
             <Modal title="Xác nhận thanh toán" open={isModalVisible} onOk={handleConfirmPayment} onCancel={() => setIsModalVisible(false)}>
                 <p>Bạn có muốn xác nhận khoản thanh toán này không?</p>
             </Modal>
-        </div>
+        </div >
     );
 }
 
