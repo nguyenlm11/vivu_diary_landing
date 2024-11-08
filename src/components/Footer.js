@@ -1,15 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { FaArrowUp, FaFacebookF, FaTiktok, FaEnvelope } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
 import { Link } from 'react-router-dom';
-import { Button, Modal } from 'antd';
 
 function Footer() {
     const { isDarkTheme } = useContext(ThemeContext);
-    const [open, setOpen] = useState(null); // Lưu trạng thái modal cho từng ảnh
-
-    const handleOpen = (imageNumber) => setOpen(imageNumber); // Mở modal với ảnh tương ứng
-    const handleClose = () => setOpen(null);
 
     return (
         <footer style={{
@@ -17,12 +12,10 @@ function Footer() {
             backgroundImage: isDarkTheme ? 'url(images/background.jpg)' : 'url(images/.jpg',
         }}>
             <div style={{ ...styles.container, borderBottom: isDarkTheme ? '1px solid #FFFFFF' : '1px solid #8EACCD' }} >
-                {/* Logo/Grid pattern section */}
                 < div style={styles.logoSection}>
                     <img style={styles.logo} src={!isDarkTheme ? "images/logo.jpg" : "images/logo_2.jpg"} alt="Vivu Diary Logo" />
                 </div>
 
-                {/* Links section */}
                 <div>
                     <h3 style={{ fontWeight: '900', color: isDarkTheme ? '#F9F1AA' : '#195F98' }}>Liên kết hữu ích</h3>
                     <p><Link style={{ ...styles.link, color: isDarkTheme ? '#FFFFFF' : '#8EACCD' }} to="/">● Trang chủ</Link></p>
