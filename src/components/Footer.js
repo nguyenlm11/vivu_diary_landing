@@ -80,9 +80,8 @@ const styles = {
         padding: '20px',
         color: '#333',
         textAlign: 'center',
-        boxShadow: 'rgba(0, 0, 0, 0.5) 0px 2px 8px',
-        position: 'relative',
-        zIndex: 1000,
+        boxShadow: 'rgba(0, 0, 0, 0.5) 0px -2px 8px',
+        zIndex: 100,
     },
     container: {
         display: 'flex',

@@ -154,7 +154,7 @@ const styles = {
         padding: '10px 20px',
         boxShadow: 'rgba(0, 0, 0, 0.5) 0px 2px 8px',
         position: 'relative',
-        zIndex: 1000,
+        zIndex: 100,
     },
     logoContainer: {
         display: 'flex',
