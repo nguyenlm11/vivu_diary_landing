@@ -202,6 +202,11 @@ function AdminAndPayment() {
         }
     };
 
+    const handleCountUser = (number) => {
+        const currentUser = Math.max(number - 4, 0);
+        return currentUser;
+    }
+
     const columns = viewMode === 'payments' ? [
         { title: 'Payment ID', dataIndex: 'paymentId', key: 'paymentId' },
         { title: 'Customer Name', dataIndex: 'customerId', render: (id) => userNames[id] },
@@ -277,7 +282,7 @@ function AdminAndPayment() {
                             <YAxis />
                             <Tooltip />
                             <Legend />
-                            <Line type="monotone" dataKey="total" stroke="#82ca9d" />
+                            <Line type="linear" dataKey="total" stroke="#82ca9d" />
                         </LineChart>
                     </ResponsiveContainer>
                 </div>
@@ -286,7 +291,7 @@ function AdminAndPayment() {
             <div style={{ display: 'flex', justifyContent: 'space-around' }}>
                 <div style={{ textAlign: 'center' }}>
                     <h2>Tổng người dùng</h2>
-                    <h4 style={{ color: '#2E5C8A' }}>{userTotal - 4}</h4>
+                    <h4 style={{ color: '#2E5C8A' }}>{handleCountUser(userTotal)}</h4>
                 </div>
 
                 <div style={{ textAlign: 'center', }}>
