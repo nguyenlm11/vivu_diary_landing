@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Tag, message, Button, Popconfirm, Pagination, Modal, Select, DatePicker } from 'antd';
-import { DeleteOutlined, LockFilled, UnlockFilled } from '@ant-design/icons';
+import { Table, Tag, message, Button, Popconfirm, Pagination, Modal, Select } from 'antd';
+import { LockFilled, UnlockFilled } from '@ant-design/icons';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import moment from 'moment';
 
 const { Option } = Select;
 
@@ -14,7 +13,6 @@ function AdminAndPayment() {
     const [totalRevenue, setTotalRevenue] = useState(0);
     const [dailyTransactionCount, setDailyTransactionCount] = useState(0);
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-    const [transactionCount, setTransactionCount] = useState(0);
     const [currentPage, setCurrentPage] = useState({ payments: 1, users: 1 });
 
     // Pagination states for payments
@@ -291,7 +289,7 @@ function AdminAndPayment() {
                     <h4 style={{ color: '#2E5C8A' }}>{userTotal - 4}</h4>
                 </div>
 
-                <div style={{ textAlign: 'center',  }}>
+                <div style={{ textAlign: 'center', }}>
                     <h2>Tổng giao dịch</h2>
                     <h4 style={{ color: '#FF5733' }}>{premiumCount}</h4>
                 </div>
@@ -303,10 +301,11 @@ function AdminAndPayment() {
             </div>
 
             <Table
-                title={() => <h1 style={{
-                    textAlign: 'center',
-                    color: '#2E5C8A'
-                }}>{viewMode === 'payments' ? "Quản lý Giao dịch" : "Quản lý Người dùng"}</h1>}
+                style={{ marginBottom: 16 }}
+                title={() =>
+                    <h1 style={{ textAlign: 'center', color: '#2E5C8A' }}>
+                        {viewMode === 'payments' ? "Quản lý Giao dịch" : "Quản lý Người dùng"}
+                    </h1>}
                 dataSource={viewMode === 'payments' ? payments : users}
                 columns={columns}
                 loading={loading}
@@ -328,14 +327,8 @@ function AdminAndPayment() {
                         setUserPageSize(pageSize);
                     }
                 }}
-
+                align='center'
                 showSizeChanger
-                style={{
-                    transform: 'translate(43%, 50%)',
-                    marginTop: 16,
-                    marginBottom: 20,
-                    position: 'relative'
-                }}
             />
 
             <Modal title="Xác nhận thanh toán" open={isModalVisible} onOk={handleConfirmPayment} onCancel={() => setIsModalVisible(false)}>
