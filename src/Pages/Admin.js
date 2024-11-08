@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Tag, message, Button, Popconfirm, Pagination, Modal, Select } from 'antd';
 import { LockFilled, UnlockFilled } from '@ant-design/icons';
 import axios from 'axios';
+import '../../src/App.css';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const { Option } = Select;
@@ -179,6 +180,7 @@ function AdminAndPayment() {
             });
             message.success('Payment confirmed successfully');
             fetchPayments();
+            fetchUserStatistics();
             setIsModalVisible(false);
         } catch (error) {
             message.error('Failed to confirm payment');
@@ -208,26 +210,26 @@ function AdminAndPayment() {
     }
 
     const columns = viewMode === 'payments' ? [
-        { title: 'Payment ID', dataIndex: 'paymentId', key: 'paymentId' },
-        { title: 'Customer Name', dataIndex: 'customerId', render: (id) => userNames[id] },
-        { title: 'Total', dataIndex: 'total', render: (total) => `${total.toLocaleString()} VNĐ` },
-        { title: 'Payment Status', dataIndex: 'paymentStatus', render: (status) => <Tag color={status === 1 ? 'gold' : 'green'}>{status === 1 ? 'Pending' : 'Paid'}</Tag> },
+        { title: 'Mã giao dịch', dataIndex: 'paymentId', key: 'paymentId' },
+        { title: 'Tên khách hàng', dataIndex: 'customerId', render: (id) => userNames[id] },
+        { title: 'Gói đăng ký', dataIndex: 'total', render: (total) => `${total.toLocaleString()} VNĐ` },
+        { title: 'Trạng thái', dataIndex: 'paymentStatus', render: (status) => <Tag color={status === 1 ? 'gold' : 'green'}>{status === 1 ? 'Chờ xác nhận' : 'Đã thanh toán'}</Tag> },
         {
-            title: 'Action', key: 'action', render: (_, record) => record.paymentStatus === 1 && (
-                <Button type="primary" onClick={() => { setSelectedPaymentId(record.id); setIsModalVisible(true); }}>Confirm</Button>
+            title: '', key: 'action', render: (_, record) => record.paymentStatus === 1 && (
+                <Button type="primary" onClick={() => { setSelectedPaymentId(record.id); setIsModalVisible(true); }}>Xác nhận</Button>
             )
         }
     ] : [
-        { title: 'Name', dataIndex: 'fullName', key: 'fullName' },
+        { title: 'Tên khách hàng', dataIndex: 'fullName', key: 'fullName' },
         { title: 'Email', dataIndex: 'email', key: 'email' },
-        { title: 'Phone', dataIndex: 'phoneNumber', key: 'phoneNumber' },
-        { title: 'Premium', dataIndex: 'isPremium', render: (isPremium) => <Tag color={isPremium ? 'gold' : 'blue'}>{isPremium ? 'Premium' : 'Regular'}</Tag> },
-        { title: 'Status', dataIndex: 'status', render: (status) => <Tag color={status === 1 ? 'green' : 'red'}>{status === 1 ? 'Active' : 'Banned'}</Tag> },
+        { title: 'Số điện thoại', dataIndex: 'phoneNumber', key: 'phoneNumber' },
+        { title: 'Tài khoản', dataIndex: 'isPremium', render: (isPremium) => <Tag color={isPremium ? 'gold' : 'blue'}>{isPremium ? 'Premium' : 'Thường'}</Tag> },
+        { title: 'Trạng thái', dataIndex: 'status', render: (status) => <Tag color={status === 1 ? 'green' : 'red'}>{status === 1 ? 'Hoạt động' : 'Bị khóa'}</Tag> },
         {
-            title: 'Action',
+            title: '',
             key: 'action',
             render: (_, record) => (
-                <Popconfirm title={`Are you sure you want to ${record.status === 1 ? 'ban' : 'unban'} this user?`} onConfirm={() => handleToggleBan(record.id, record.status === 1)}>
+                <Popconfirm title={`Bạn có muốn ${record.status === 1 ? 'khóa' : 'gỡ khóa'} người dùng này?`} onConfirm={() => handleToggleBan(record.id, record.status === 1)}>
                     <Button>{record.status === 1 ? <LockFilled /> : <UnlockFilled />}</Button>
                 </Popconfirm>
             )
@@ -338,7 +340,7 @@ function AdminAndPayment() {
             />
 
             <Modal title="Xác nhận thanh toán" open={isModalVisible} onOk={handleConfirmPayment} onCancel={() => setIsModalVisible(false)}>
-                <p>Bạn có chắc chắn muốn xác nhận thanh toán này không?</p>
+                <p>Bạn có muốn xác nhận khoản thanh toán này không?</p>
             </Modal>
         </div>
     );
