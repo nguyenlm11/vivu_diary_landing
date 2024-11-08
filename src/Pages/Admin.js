@@ -310,6 +310,7 @@ function AdminAndPayment() {
                 columns={columns}
                 loading={loading}
                 pagination={false}
+                bordered={true}
                 rowKey={(record) => record.paymentId || record.id}
             />
 
